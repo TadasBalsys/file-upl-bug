@@ -1,0 +1,4 @@
+.dx-hidden,
+.dx-state-invisible {
+  display: none !important;
+}
