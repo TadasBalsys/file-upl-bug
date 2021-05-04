@@ -1,119 +1,130 @@
-import { useState } from "react";
-
+import React from "react";
 import FileUploader from "devextreme-react/file-uploader";
 import ProgressBar from "devextreme-react/progress-bar";
-import Icon from "../Icon/Icon";
 
-import "./FileUploaderWithPreview.style.scss";
+interface State {
+  isDropZoneActive: boolean;
+  imageSource: string;
+  textVisible: boolean;
+  progressVisible: boolean;
+  progressValue: number;
+}
 
-const FileUploaderWithPreview = () => {
-  const [isDropZoneActive, setIsDropZoneActive] = useState(false);
-  const [imageSource, setImageSource] = useState<string[]>([]);
-  const [textIsVisible, setTextIsVisible] = useState(true);
-  const [isProgressVisible, setIsProgressVisible] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
+class App extends React.Component<{}, State> {
+  allowedFileExtensions: string[];
+  constructor(props: any) {
+    super(props);
 
-  const allowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png"];
+    this.state = {
+      isDropZoneActive: false,
+      imageSource: "",
+      textVisible: true,
+      progressVisible: false,
+      progressValue: 0,
+    };
+    this.allowedFileExtensions = [".jpg", ".jpeg", ".gif", ".png"];
 
-  const onDropZoneEnter = (e: any) => {
+    this.onDropZoneEnter = this.onDropZoneEnter.bind(this);
+    this.onDropZoneLeave = this.onDropZoneLeave.bind(this);
+    this.onUploaded = this.onUploaded.bind(this);
+    this.onProgress = this.onProgress.bind(this);
+    this.onUploadStarted = this.onUploadStarted.bind(this);
+  }
+
+  render() {
+    const {
+      isDropZoneActive,
+      imageSource,
+      textVisible,
+      progressVisible,
+      progressValue,
+    } = this.state;
+    return (
+      <div className="widget-container flex-box">
+        <span>Profile Picture</span>
+        <div
+          id="dropzone-external"
+          className={`flex-box ${
+            isDropZoneActive
+              ? "dx-theme-accent-as-border-color dropzone-active"
+              : "dx-theme-border-color"
+          }`}
+        >
+          {imageSource && <img id="dropzone-image" src={imageSource} alt="" />}
+          {textVisible && (
+            <div id="dropzone-text" className="flex-box">
+              <span>Drag & Drop the desired file</span>
+              <span>…or click to browse for a file instead.</span>
+            </div>
+          )}
+          <ProgressBar
+            id="upload-progress"
+            min={0}
+            max={100}
+            width="30%"
+            showStatus={false}
+            visible={progressVisible}
+            value={progressValue}
+          ></ProgressBar>
+        </div>
+        <FileUploader
+          id="file-uploader"
+          dialogTrigger="#dropzone-external"
+          dropZone="#dropzone-external"
+          multiple={false}
+          allowedFileExtensions={this.allowedFileExtensions}
+          uploadMode="instantly"
+          uploadUrl="https://js.devexpress.com/Demos/NetCore/FileUploader/Upload"
+          visible={false}
+          onDropZoneEnter={this.onDropZoneEnter}
+          onDropZoneLeave={this.onDropZoneLeave}
+          onUploaded={this.onUploaded}
+          onProgress={this.onProgress}
+          onUploadStarted={this.onUploadStarted}
+        ></FileUploader>
+      </div>
+    );
+  }
+
+  onDropZoneEnter(e: any) {
     if (e.dropZoneElement.id === "dropzone-external") {
-      setIsDropZoneActive(true);
+      this.setState({ isDropZoneActive: true });
     }
-  };
+  }
 
-  const onDropZoneLeave = (e: any) => {
+  onDropZoneLeave(e: any) {
     if (e.dropZoneElement.id === "dropzone-external") {
-      setIsDropZoneActive(false);
+      this.setState({ isDropZoneActive: false });
     }
-  };
+  }
 
-  const onUploaded = (e: any) => {
+  onUploaded(e: any) {
     const file = e.file;
     const fileReader = new FileReader();
     fileReader.onload = () => {
-      setIsDropZoneActive(false);
-      setImageSource((prevState: string[]) => {
-        return [...prevState, fileReader.result as string];
+      this.setState({
+        isDropZoneActive: false,
+        imageSource: fileReader.result as string,
       });
     };
     fileReader.readAsDataURL(file);
-    setTextIsVisible(false);
-    setIsProgressVisible(false);
-    setProgressValue(0);
-  };
+    this.setState({
+      textVisible: false,
+      progressVisible: false,
+      progressValue: 0,
+    });
+  }
 
-  const onProgress = (e: any) => {
-    const progressValue = (e.bytesLoaded / e.bytesTotal) * 100;
-    setProgressValue(progressValue);
-  };
+  onProgress(e: any) {
+    this.setState({ progressValue: (e.bytesLoaded / e.bytesTotal) * 100 });
+  }
 
-  const onUploadStarted = () => {
-    console.log("onUploadStarted"); // Only executes when drag&drop used or first time uploaded a file with the file picker
-    setIsProgressVisible(true);
-  };
+  onUploadStarted() {
+    this.setState({
+      imageSource: "",
+      progressVisible: true,
+    });
+  }
+}
 
-  return (
-    <div className="file-uploader">
-      <div
-        id="dropzone-external"
-        className={`flex-box ${
-          isDropZoneActive
-            ? "dx-theme-accent-as-border-color dropzone-active"
-            : "dx-theme-border-color"
-        }`}
-        onClick={() => {
-          console.log("onClick dropzone-external");
-        }}
-      >
-        {imageSource && (
-          <img id="dropzone-image" src={imageSource[0] as string} alt="" />
-        )}
-
-        {textIsVisible && (
-          <div id="dropzone-text" className="flex-box">
-            <Icon />
-          </div>
-        )}
-        <ProgressBar
-          id="upload-progress"
-          min={0}
-          max={100}
-          width="30%"
-          showStatus={false}
-          visible={isProgressVisible}
-          value={progressValue}
-        />
-      </div>
-      <div className="file-uploader__mini-preview-list">
-        {(imageSource as string[]).map(
-          (img, i) =>
-            i > 0 && (
-              <img
-                key={i}
-                src={img as string}
-                alt=""
-                className="file-uploader__mini-preview"
-              />
-            )
-        )}
-      </div>
-      <FileUploader
-        id="file-uploader"
-        dialogTrigger="#dropzone-external"
-        dropZone="#dropzone-external"
-        multiple={true}
-        allowedFileExtensions={allowedFileExtensions}
-        // uploadMode="instantly"
-        // uploadUrl="https://js.devexpress.com/Demos/NetCore/FileUploader/Upload"
-        visible={false}
-        onDropZoneEnter={onDropZoneEnter}
-        onDropZoneLeave={onDropZoneLeave}
-        onUploadStarted={onUploadStarted}
-        onUploaded={onUploaded}
-        onProgress={onProgress}
-      />
-    </div>
-  );
-};
-
-export default FileUploaderWithPreview;
+export default App;
