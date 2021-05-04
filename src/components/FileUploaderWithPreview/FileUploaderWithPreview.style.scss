@@ -1,0 +1,61 @@
+@import "../../vars";
+
+.file-uploader {
+  #dropzone-external {
+    cursor: pointer;
+    width: 283px;
+    height: 168px;
+    background-color: $styleguide-surface-color;
+    border-width: 1px;
+    border: 1px solid $image-uploader-border;
+    padding: 10px;
+  }
+
+  #dropzone-external > * {
+    pointer-events: none;
+  }
+
+  // #dropzone-external.dropzone-active {
+  //   border-style: solid;
+  // }
+
+  .widget-container > span {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+
+  #dropzone-image {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  #dropzone-text > span {
+    font-weight: 100;
+    opacity: 0.5;
+  }
+
+  #upload-progress {
+    display: flex;
+    margin-top: 10px;
+  }
+
+  .flex-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__mini-preview-list {
+    margin-top: 0.5625rem;
+  }
+
+  &__mini-preview {
+    margin-right: 0.5625rem;
+    max-width: 64px;
+    width: 100%;
+    max-height: 37px;
+    height: 100%;
+  }
+}

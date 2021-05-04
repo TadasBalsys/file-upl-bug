@@ -1,0 +1,36 @@
+@import "../../vars";
+
+.project-media {
+  &__header {
+    font: normal normal normal 1.0625rem/1.3125rem MarkWXX;
+    color: $styleguide-header-font-color-2;
+    border-bottom: 1px solid $styleguide-border-color;
+    padding-bottom: 1.875rem;
+  }
+
+  &__box {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    margin-top: 2.25rem;
+  }
+
+  &__title,
+  &__size {
+    font-size: 0.9375rem;
+    font: normal normal normal 0.9375rem/1.3125rem MarkWXX;
+    text-transform: capitalize;
+  }
+
+  &__title {
+    color: $styleguide-header-font-color-3;
+  }
+
+  &__sizes-list {
+    margin-right: 2.125rem;
+  }
+
+  &__size {
+    font-weight: 200;
+    color: $project-media-color1;
+  }
+}
